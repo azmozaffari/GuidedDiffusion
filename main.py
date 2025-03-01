@@ -8,10 +8,12 @@ import os
 import torch
 import numpy as np
 # import torch.utils.tensorboard as tb
-import copy
+from PIL import Image
+import torchvision.transforms as transforms
 
 from models.diffusion import DDPM
-from utilities.sampler import sampler
+from models.classifier import *
+from utilities.sampler import sampler,  DDIM_inversion, DDIM_generation
 
 import os
 torch.cuda.empty_cache() 
@@ -54,25 +56,7 @@ def parse_args_and_config():
     logger.addHandler(handler1)
     logger.setLevel(level)
 
-    # os.makedirs(os.path.join(args.exp, 'image_samples'), exist_ok=True)
-    # args.image_folder = os.path.join(args.exp, 'image_samples', args.image_folder)
-    # if not os.path.exists(args.image_folder):
-    #     os.makedirs(args.image_folder)
-    # else:
-    #     overwrite = False
-    #     if args.ni:
-    #         overwrite = True
-    #     else:
-    #         response = input("Image folder already exists. Overwrite? (Y/N)")
-    #         if response.upper() == 'Y':
-    #             overwrite = True
-
-    #     if overwrite:
-    #         shutil.rmtree(args.image_folder)
-    #         os.makedirs(args.image_folder)
-    #     else:
-    #         print("Output image folder exists. Program halted.")
-    #         sys.exit(0)
+   
 
     # add device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -125,8 +109,31 @@ def main():
 
 
 
-    #sample from the pre-trained model
-    sampler(model, config)
+
+    # Read a PIL image
+    image = Image.open(config.input.address)
+    transform = transforms.Compose([
+        transforms.PILToTensor(),
+        transforms.Resize(config.data.image_size)        
+    ]) 
+    x0 = transform(image).to(config.device)
+    x0 = x0.unsqueeze(0).float()
+    x_min, x_max = x0.min(), x0.max()
+    x0 = (x0 - x_min) / (x_max-x_min)
+    tr = transforms.Compose([transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    x0 = tr(x0)
+
+
+  
+    # add noise till forward steps
+    xt = DDIM_inversion(model, config, x0)
+    # denoise the forward path
+    DDIM_generation(model, config, xt)
+
+
+    # print(loss(config,x0,x0))
+
+
 
     return 0
 
