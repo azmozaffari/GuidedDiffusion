@@ -42,11 +42,19 @@ samplingDDIM:
     num_timesteps: 1000
     sigma : 0
     forward_timesteps: 450
-    step_forward: 8
-    step_backward: 16
+    step_forward: 4
+    step_backward: 400
 
 output:
     address: "./img"
 
 input:
     address: "./img/inputs/2.jpeg"
+
+
+training:
+    clean_address: "./data/training/clean"
+    noisy_address: "./data/training/noisy"
+    label_address: "./data/training/label"
+    n_epochs: 10
+    lr : 0.1

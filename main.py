@@ -1,19 +1,20 @@
 import argparse
 import traceback
-import shutil
 import logging
 import yaml
 import sys
 import os
 import torch
 import numpy as np
-# import torch.utils.tensorboard as tb
 from PIL import Image
 import torchvision.transforms as transforms
-
+from torch.utils.data import Dataset, DataLoader
 from models.diffusion import DDPM
 from models.classifier import *
 from utilities.sampler import sampler,  DDIM_inversion, DDIM_generation
+from utilities.training import *
+from utilities.load_data import *
+
 
 import os
 torch.cuda.empty_cache() 
@@ -109,29 +110,22 @@ def main():
 
 
 
-
-    # Read a PIL image
-    image = Image.open(config.input.address)
-    transform = transforms.Compose([
-        transforms.PILToTensor(),
-        transforms.Resize(config.data.image_size)        
-    ]) 
-    x0 = transform(image).to(config.device)
-    x0 = x0.unsqueeze(0).float()
-    x_min, x_max = x0.min(), x0.max()
-    x0 = (x0 - x_min) / (x_max-x_min)
-    tr = transforms.Compose([transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    x0 = tr(x0)
+    # convertImgtoNoise(model,config)  ################  prepare training data by adding noise
 
 
-  
-    # add noise till forward steps
-    xt = DDIM_inversion(model, config, x0)
-    # denoise the forward path
-    DDIM_generation(model, config, xt)
+    d = FaceDataset("./data/training")
+
+    dataloader = DataLoader(d, batch_size=4,
+                        shuffle=True, num_workers=4)
+    
+    
+    train(model, config, dataloader)
+        
 
 
-    # print(loss(config,x0,x0))
+
+
+
 
 
 

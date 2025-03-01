@@ -77,7 +77,12 @@ def DDIM_inversion(model, config, x0):
                       config.data.channels,
                       config.data.image_size,
                       config.data.image_size)).to(config.device)
+    
+    
+    
     x1 = scheduler.add_noise(x0,z,1)
+
+    
 
     # now predict the added noise with the pretrained model
     noise_pred = model(x1, torch.as_tensor(1).unsqueeze(0).to(config.device))
@@ -95,18 +100,18 @@ def DDIM_inversion(model, config, x0):
             noise_pred = model(xt, torch.as_tensor(t*step).unsqueeze(0).to(config.device))
 
             
-            # Save x0
-            ims = torch.clamp(xt_1, -1., 1.).detach().cpu()
-            ims = (ims + 1) / 2
-            ims = ims.squeeze(0)           
-            img = torchvision.transforms.ToPILImage()(ims)
+            # # Save x0
+            # ims = torch.clamp(xt_1, -1., 1.).detach().cpu()
+            # ims = (ims + 1) / 2
+            # ims = ims.squeeze(0)           
+            # img = torchvision.transforms.ToPILImage()(ims)
 
 
-            if not os.path.exists(os.path.join(config.output.address, 'DDIMsamples')):
-                os.mkdir(os.path.join(config.output.address, 'DDIMsamples'))
+            # if not os.path.exists(os.path.join(config.output.address, 'DDIMsamples')):
+            #     os.mkdir(os.path.join(config.output.address, 'DDIMsamples'))
             
-            img.save(os.path.join(config.output.address, 'DDIMsamples', 'x0_{}.png'.format(t)))
-            img.close()
+            # img.save(os.path.join(config.output.address, 'DDIMsamples', 'x0_{}.png'.format(t)))
+            # img.close()
             xt_1 = xt
     return xt
 
@@ -121,35 +126,17 @@ def DDIM_generation(model, config, xt):
     scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.num_timesteps,
                                     beta_start=config.samplingDDIM.beta_start,
                                     beta_end=config.samplingDDIM.beta_end)
-    model.eval()
     step = config.samplingDDIM.step_backward
-    with torch.no_grad():
+    for i in tqdm(reversed(range(int(config.samplingDDIM.forward_timesteps/step)))):        
         
-
-        for i in tqdm(reversed(range(int(config.samplingDDIM.forward_timesteps/step)))):        
-            
-            # Get prediction of noise
-            noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))
-            
-            # Use scheduler to get x0 and xt-1
-            xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
-            
-            # Save x0
-            ims = torch.clamp(xt, -1., 1.).detach().cpu()
-            ims = (ims + 1) / 2
-            ims = ims.squeeze(0)
-            # grid = make_grid(ims, nrow=train_config['num_grid_rows'])
-            # img = torchvision.transforms.ToPILImage()(grid)
-            
-            img = torchvision.transforms.ToPILImage()(ims)
-
-
-            if not os.path.exists(os.path.join(config.output.address, 'DDIMGeneration')):
-                os.mkdir(os.path.join(config.output.address, 'DDIMGeneration'))
-            
-            img.save(os.path.join(config.output.address, 'DDIMGeneration', 'x0_{}.png'.format(i)))
-            img.close()
-            xt = xt_1
+        # Get prediction of noise
+        noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))
+        
+        # Use scheduler to get x0 and xt-1
+        xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
+        xt = xt_1
+    
+    return xt
 
 
 

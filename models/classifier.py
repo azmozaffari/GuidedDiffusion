@@ -20,9 +20,9 @@ def loss(config, img1, img2):
         image_features_2 = model.encode_image(img2).float()
 
     cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
-    loss_1 = cos(image_features_1, image_features_2)
+    loss_1 = -cos(image_features_1, image_features_2)
 
 
-    loss_id
+   
     
     return loss_1
