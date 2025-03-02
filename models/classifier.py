@@ -1,28 +1,34 @@
 import torch
-import torchvision.transforms as T
-
 import clip
-import numpy as np
+import torch.nn as nn
 
-def loss(config, img1, img2):
-    img1 = img1.to(config.device)
-    img2 = img2.to(config.device)
+
+
+class loss(nn.Module):
+    def __init__(self,config):
+        super().__init__()
+        self.model, self.preprocess = clip.load("ViT-B/32",device=config.device)
+        self.preprocess.transforms.pop(2)
+        self.preprocess.transforms.pop(2)
+        self.config = config
+
+        for param in self.model.parameters():
+            param.requiers_grad = False
+
+
     
-    model, preprocess = clip.load("ViT-B/32",device=config.device)
+    def forward(self,img1, img2):
+        img1 = img1.to(self.config.device)
+        img2 = img2.to(self.config.device)
+        
+        img1 = self.preprocess(img1)
+        img2 = self.preprocess(img2)
+        
+       
+        image_features_1 = self.model.encode_image(img1).float()
+        image_features_2 = self.model.encode_image(img2).float()
 
-    preprocess.transforms.pop(2)
-    preprocess.transforms.pop(2)
-    img1 = preprocess(img1)
-    img2 = preprocess(img2)
-    
-    with torch.no_grad():
-        image_features_1 = model.encode_image(img1).float()
-        image_features_2 = model.encode_image(img2).float()
-
-    cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
-    loss_1 = -cos(image_features_1, image_features_2)
-
-
-   
-    
-    return loss_1
+        cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
+        
+        
+        return torch.mean(-cos(image_features_1, image_features_2)) 

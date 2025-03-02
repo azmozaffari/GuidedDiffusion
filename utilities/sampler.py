@@ -77,12 +77,7 @@ def DDIM_inversion(model, config, x0):
                       config.data.channels,
                       config.data.image_size,
                       config.data.image_size)).to(config.device)
-    
-    
-    
     x1 = scheduler.add_noise(x0,z,1)
-
-    
 
     # now predict the added noise with the pretrained model
     noise_pred = model(x1, torch.as_tensor(1).unsqueeze(0).to(config.device))
@@ -92,26 +87,9 @@ def DDIM_inversion(model, config, x0):
     step = config.samplingDDIM.step_forward
     with torch.no_grad():
         
-
         for t in tqdm((range(1,int(config.samplingDDIM.forward_timesteps/step)))):  
-            
-            
             xt = scheduler.sample_forward_timestep(xt_1, torch.as_tensor(t).to(config.device), noise_pred, step)            
             noise_pred = model(xt, torch.as_tensor(t*step).unsqueeze(0).to(config.device))
-
-            
-            # # Save x0
-            # ims = torch.clamp(xt_1, -1., 1.).detach().cpu()
-            # ims = (ims + 1) / 2
-            # ims = ims.squeeze(0)           
-            # img = torchvision.transforms.ToPILImage()(ims)
-
-
-            # if not os.path.exists(os.path.join(config.output.address, 'DDIMsamples')):
-            #     os.mkdir(os.path.join(config.output.address, 'DDIMsamples'))
-            
-            # img.save(os.path.join(config.output.address, 'DDIMsamples', 'x0_{}.png'.format(t)))
-            # img.close()
             xt_1 = xt
     return xt
 
@@ -128,7 +106,7 @@ def DDIM_generation(model, config, xt):
                                     beta_end=config.samplingDDIM.beta_end)
     step = config.samplingDDIM.step_backward
     for i in tqdm(reversed(range(int(config.samplingDDIM.forward_timesteps/step)))):        
-        
+        # xt.requiers_grad = False
         # Get prediction of noise
         noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))
         

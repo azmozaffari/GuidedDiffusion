@@ -43,7 +43,7 @@ samplingDDIM:
     sigma : 0
     forward_timesteps: 450
     step_forward: 4
-    step_backward: 400
+    step_backward: 16
 
 output:
     address: "./img"
