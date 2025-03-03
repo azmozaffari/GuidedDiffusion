@@ -7,6 +7,7 @@ from torch.autograd import Variable
 import torch.nn as nn
 from scheduler.linear_noise_scheduler import LinearNoiseScheduler,LinearNoiseSchedulerDDIM
 from tqdm import tqdm
+# from models.diffusion import DDPM
 
 def train(model, config, dataloader):
     torch.cuda.empty_cache() 
@@ -31,13 +32,14 @@ def train(model, config, dataloader):
         batch_size = 0
         total_loss = [0]*int(config.samplingDDIM.forward_timesteps/step)
 
-        for clean_img, noisy_img, label in dataloader:
+        for clean_img,  label in dataloader:
             batch_size += clean_img.size(0) 
             # clean_img = clean_img.to(config.device)  ## later it can be used for id loss but in this version we do not need this 
+            noisy_img = DDIM_inversion(model, config, clean_img)
             noisy_img = noisy_img.to(config.device)
             label = label.to(config.device)            
             
-            for i in tqdm(reversed(range(int(config.samplingDDIM.forward_timesteps/step)))):      
+            for i in tqdm(reversed(1,range(int(config.samplingDDIM.forward_timesteps/step)))):      
 
 
                 # Get prediction of noise
@@ -53,11 +55,16 @@ def train(model, config, dataloader):
                 l.backward()
                 optimizer.step()
                 total_loss[i] = l.data
-                noisy_img = torch.tensor(noisy_img)
+                noisy_img = noisy_img.clone().detach().requires_grad_(False)
             
             
         print("Epoch %d: SGD lr=%.4f"% (epoch, optimizer.param_groups[0]["lr"]))
-        print("total loss:", torch.tensor(total_loss)/batch_size)
+        print("total loss:", torch.mean(torch.tensor(total_loss)/batch_size).data)    
+        torch.save(model.state_dict(), config.training.checkpoints+"/ckpt"+str(epoch))
+    
+
+
+    
  
 
 

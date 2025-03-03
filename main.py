@@ -13,6 +13,7 @@ from models.diffusion import DDPM
 from models.classifier import *
 from utilities.sampler import sampler,  DDIM_inversion, DDIM_generation
 from utilities.training import *
+from utilities.test import *
 from utilities.load_data import *
 
 
@@ -112,12 +113,38 @@ def main():
 
     # convertImgtoNoise(model,config)  ################  prepare training data by adding noise
 
-    d = FaceDataset("./data/training")
-    dataloader = DataLoader(d, batch_size=2,
-                        shuffle=True, num_workers=1)
     
     
-    train(model, config, dataloader)
+    
+    #############  TRAIN ############################
+    # d = FaceDataset("./data/training")
+    # dataloader = DataLoader(d, batch_size=2,
+    #                     shuffle=True, num_workers=1)
+    
+    
+    # train(model, config, dataloader)
+
+
+    ################  TEST  ##########################
+
+    
+    
+    torch.cuda.empty_cache() 
+
+    
+    model_pretrained = DDPM(config)
+
+
+ 
+
+
+    
+    for param in model.parameters():
+        param.requires_grad = False
+
+    xt = convertImgtoNoise(model,config, "test")
+    
+    test(model,config,xt)
         
     return 0
 

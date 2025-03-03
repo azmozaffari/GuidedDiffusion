@@ -9,10 +9,18 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
 # get the path/directory
-def convertImgtoNoise(model,config):
-    folder_dir = config.training.clean_address
+def convertImgtoNoise(model,config, condition="train"):
+    if condition == "train":
+        clean_image_path = config.training.clean_address
+        noisy_image_path = config.training.noisy_address
+    if condition == "test":
+        clean_image_path = config.test.clean_address
+        noisy_image_path = config.test.noisy_address
+
+
+    folder_dir = clean_image_path
     image_list = os.listdir(folder_dir)
-    print(image_list)
+    
     for i in range(len(image_list)):
         # Read a PIL image
         image = Image.open(folder_dir +"/"+image_list[i])
@@ -37,11 +45,11 @@ def convertImgtoNoise(model,config):
         ims = ims.squeeze(0)    
         img = transforms.ToPILImage()(ims)
 
-        if not os.path.exists(config.training.noisy_address):
-            os.mkdir(config.output.address)    
-        img.save(os.path.join(config.training.noisy_address, image_list[i]))
+        if not os.path.exists(noisy_image_path):
+            os.mkdir(noisy_image_path)    
+        img.save(os.path.join(noisy_image_path, image_list[i]))
         img.close()
-
+    return xt
 class FaceDataset(Dataset):
     """source image, noisy image and target image."""
 
@@ -69,7 +77,7 @@ class FaceDataset(Dataset):
         img_name = os.path.join(self.root_dir,'clean', str(idx+1)+'.jpg')
 
         
-        noisy_name = os.path.join(self.root_dir,'noisy', str(idx+1)+'.jpg')
+        # noisy_name = os.path.join(self.root_dir,'noisy', str(idx+1)+'.jpg')
 
         label_name = os.path.join(self.root_dir,'clean', str(idx+1)+'.jpg')
         
@@ -88,17 +96,17 @@ class FaceDataset(Dataset):
         img = tr(x0)
 
 
-        noisy = Image.open(noisy_name)
-        transform = transforms.Compose([
-            transforms.PILToTensor(),
-            transforms.Resize((256,256))        
-        ]) 
-        x0 = transform(noisy)
-        # x0 = x0.unsqueeze(0).float()
-        x_min, x_max = x0.min(), x0.max()
-        x0 = (x0 - x_min) / (x_max-x_min)
-        tr = transforms.Compose([transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-        noisy = tr(x0)
+        # noisy = Image.open(noisy_name)
+        # transform = transforms.Compose([
+        #     transforms.PILToTensor(),
+        #     transforms.Resize((256,256))        
+        # ]) 
+        # x0 = transform(noisy)
+        # # x0 = x0.unsqueeze(0).float()
+        # x_min, x_max = x0.min(), x0.max()
+        # x0 = (x0 - x_min) / (x_max-x_min)
+        # tr = transforms.Compose([transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        # noisy = tr(x0)
 
 
         label = Image.open(label_name)
@@ -116,4 +124,4 @@ class FaceDataset(Dataset):
 
 
 
-        return img,noisy,label
+        return img,label

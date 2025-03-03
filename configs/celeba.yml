@@ -42,8 +42,8 @@ samplingDDIM:
     num_timesteps: 1000
     sigma : 0
     forward_timesteps: 450
-    step_forward: 4
-    step_backward: 100
+    step_forward: 16
+    step_backward: 16
 
 output:
     address: "./img"
@@ -58,3 +58,10 @@ training:
     label_address: "./data/training/label"
     n_epochs: 10
     lr : 0.1
+    checkpoints: "./data/checkpoints"
+
+
+test:
+    clean_address: "./data/test/clean"
+    noisy_address: "./data/test/noisy"
+    generated_address: "./data/test/generated"

@@ -101,31 +101,38 @@ def DDIM_inversion(model, config, x0):
 
 
 def DDIM_generation(model, config, xt):
-  
+   
+
     scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.num_timesteps,
                                     beta_start=config.samplingDDIM.beta_start,
                                     beta_end=config.samplingDDIM.beta_end)
     step = config.samplingDDIM.step_backward
-    t = 0
-    for i in tqdm(reversed(range(int(config.samplingDDIM.forward_timesteps/step)))):        
-        # xt.requiers_grad = False
+    for i in tqdm(reversed(range(1,int(config.samplingDDIM.forward_timesteps/step)))):        
         # Get prediction of noise
         noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
         # Use scheduler to get x0 and xt-1
         xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
         xt = xt_1
-        t = i
-    
-    
 
 
 
 
+
+        # ims = torch.clamp(xt, -1., 1.).detach().cpu()
+        # ims = (ims + 1) / 2
+        # ims = ims.squeeze(0)    
+        # img = torchvision.transforms.ToPILImage()(ims)
+
+
+
+
+
+        # if not os.path.exists(config.test.generated_address):
+        #     os.mkdir(config.test.generated_address)    
+        # img.save(os.path.join(config.test.generated_address, str(i)+".jpg"))
+        # img.close()
     
    
-    # noise_pred = model(xt, torch.as_tensor((t+1)*step).unsqueeze(0).to(config.device))
-    # xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(t).to(config.device), config.samplingDDIM.sigma, step)
-    # xt = xt_1
     
     return xt
 
