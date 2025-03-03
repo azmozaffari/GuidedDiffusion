@@ -11,6 +11,7 @@ class loss(nn.Module):
         self.preprocess.transforms.pop(2)
         self.preprocess.transforms.pop(2)
         self.config = config
+        self.model.eval()
 
         for param in self.model.parameters():
             param.requiers_grad = False

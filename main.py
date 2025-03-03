@@ -113,8 +113,8 @@ def main():
     # convertImgtoNoise(model,config)  ################  prepare training data by adding noise
 
     d = FaceDataset("./data/training")
-    dataloader = DataLoader(d, batch_size=4,
-                        shuffle=True, num_workers=4)
+    dataloader = DataLoader(d, batch_size=2,
+                        shuffle=True, num_workers=1)
     
     
     train(model, config, dataloader)
