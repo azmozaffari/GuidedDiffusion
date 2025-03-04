@@ -95,6 +95,8 @@ def main():
     logging.info("Config =")
     print("<" * 80)
 
+
+# load pretrained checkpoints for face generation model
     try:
         model_p = DDPM(config)
         # runner.image_editing_sample()
@@ -110,23 +112,11 @@ def main():
     print("Pretrained Model loaded")
 
 
-    try:
-        model_f = DDPM(config)
-        # runner.image_editing_sample()
-    except Exception:
-        logging.error(traceback.format_exc())
-
-
-    # load pretrained weights to DDPM
-    ckpt =  torch.load("./data/checkpoints/ckpt9", weights_only=True)
-    model_f.load_state_dict(ckpt)
-    model_f.to(config.device)
-    # model = torch.nn.DataParallel(model)
-    print("Finetuned Model loaded")
-
+    
 
     
     # # #############  TRAIN ############################
+
     
     # # define the image transformet
     # transform = transforms.Compose([            
@@ -139,23 +129,7 @@ def main():
     # d = FaceDataset("./data/training", transform)
     # dataloader = DataLoader(d, batch_size=2,
     #                     shuffle=True, num_workers=1)
-    
-
-
-    # # save the images 
-    # for img,img_name, label, label_name in dataloader:
-    #     ims = torch.clamp(img, -1., 1.).detach().cpu()
-    #     ims = (ims + 1) / 2        
-    #     for i in range(ims.size(0)):
-    #        torchvision.utils.save_image(ims[i, :, :, :], os.path.join(config.test.gen_img_address,img_name[i]))
-        
-        
-        
-
-
-
-
-
+     
     
     # train(model_p, config, dataloader)
 
@@ -164,13 +138,46 @@ def main():
 
     
     
-    # torch.cuda.empty_cache() 
+    torch.cuda.empty_cache() 
+    # load finetuned model 
+    try:
+        model_f = DDPM(config)
+        # runner.image_editing_sample()
+    except Exception:
+        logging.error(traceback.format_exc())
+
+    # load pretrained weights to DDPM
+    ckpt =  torch.load("./data/checkpoints/ckpt9", weights_only=True)
+    model_f.load_state_dict(ckpt)
+    model_f.to(config.device)
+    # model = torch.nn.DataParallel(model)
+    print("Finetuned Model loaded")
+
+
+
+
+
+    # define the image transformet
+    transform = transforms.Compose([            
+            transforms.Resize((config.data.image_size,config.data.image_size)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ]) 
+    
+    # call the customized data loader
+    d = FaceDataset("./data/test", transform)
+    dataloader = DataLoader(d, batch_size=2,
+                        shuffle=True, num_workers=1)
+
+    # The label folder of test images can be empty! No worries
+
     
     for param in model_p.parameters():
         param.requires_grad = False
     for param in model_f.parameters():
         param.requires_grad = False
-    test(model_f, model_p,config)
+
+    test(model_f, model_p,config, dataloader)
 #####################################################################        
     return 0
 

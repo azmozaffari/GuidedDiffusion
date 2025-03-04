@@ -82,17 +82,36 @@ class FaceDataset(Dataset):
         img_list = os.listdir(self.root_dir+"/img")
         label_list = os.listdir(self.root_dir+"/label")
 
-        img_name = os.path.join(self.root_dir,'img', img_list[idx])        
-        label_name = os.path.join(self.root_dir,'label', label_list[idx])        
+        
+        if len(img_list) == 0:
+            print("Dataloader tries to load images. There is no file in the image folder")
+            img = []
+            img_name = ""
+        else:
+            img_add = os.path.join(self.root_dir,'img', img_list[idx])  
+            img = Image.open(img_add)
+            img = self.transform(img) 
+            img_name = img_list[idx]     
+
+
+        if len(label_list) == 0:
+            print("Dataloader tries to load labels. There is no file in the label folder")
+            label = []
+            label_name = ""
+        else:
+            label_add = os.path.join(self.root_dir,'label', label_list[idx]) 
+            label = Image.open(label_add)
+            label = self.transform(label)
+            label_name =  label_list[idx]   
+
+
+
         
         
-        img = Image.open(img_name)
-        img = self.transform(img)
         
-        label = Image.open(label_name)
-        label = self.transform(label)
         
 
 
 
-        return img, img_list[idx], label, label_list[idx]
+
+        return img, img_name, label, label_name
