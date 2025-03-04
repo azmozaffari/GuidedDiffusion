@@ -45,23 +45,6 @@ def sampler(model, config):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
     
 
@@ -73,7 +56,7 @@ def DDIM_inversion(model, config, x0):
     
     
     # generate random gaussian noise and add it to the original image
-    z = torch.randn((1,
+    z = torch.randn((x0.size(0),
                       config.data.channels,
                       config.data.image_size,
                       config.data.image_size)).to(config.device)

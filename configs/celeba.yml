@@ -45,15 +45,9 @@ samplingDDIM:
     step_forward: 16
     step_backward: 16
 
-output:
-    address: "./img"
-
-input:
-    address: "./img/inputs/2.jpeg"
-
 
 training:
-    clean_address: "./data/training/clean"
+    img_address: "./data/training/img"
     noisy_address: "./data/training/noisy"
     label_address: "./data/training/label"
     n_epochs: 10
@@ -62,6 +56,6 @@ training:
 
 
 test:
-    clean_address: "./data/test/clean"
+    img_address: "./data/test/img"
     noisy_address: "./data/test/noisy"
-    generated_address: "./data/test/generated"
+    gen_img_address: "./data/test/generated"

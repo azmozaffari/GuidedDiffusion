@@ -101,8 +101,13 @@ class LinearNoiseSchedulerDDIM:
         original_shape = original.shape
         batch_size = original_shape[0]
         
-        sqrt_alpha_cum_prod = self.sqrt_alpha_cum_prod.to(original.device)[t].reshape(batch_size)
-        sqrt_one_minus_alpha_cum_prod = self.sqrt_one_minus_alpha_cum_prod.to(original.device)[t].reshape(batch_size)
+        sqrt_alpha_cum_prod = self.sqrt_alpha_cum_prod.to(original.device)[t]#.reshape(batch_size)
+        sqrt_one_minus_alpha_cum_prod = self.sqrt_one_minus_alpha_cum_prod.to(original.device)[t]#.reshape(batch_size)
+
+        for _ in range(len(original_shape) - 1):
+            sqrt_alpha_cum_prod = sqrt_alpha_cum_prod.unsqueeze(-1)
+        for _ in range(len(original_shape) - 1):
+            sqrt_one_minus_alpha_cum_prod = sqrt_one_minus_alpha_cum_prod.unsqueeze(-1)
         
         # Apply and Return Forward process equation
         xt = sqrt_alpha_cum_prod.to(original.device) * original + sqrt_one_minus_alpha_cum_prod.to(original.device) * noise
