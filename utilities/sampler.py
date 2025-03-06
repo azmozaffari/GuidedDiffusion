@@ -70,7 +70,7 @@ def DDIM_inversion(model, config, x0):
     step = config.samplingDDIM.step_forward
     with torch.no_grad():
         
-        for t in tqdm((range(1,int(config.samplingDDIM.forward_timesteps/step)))):  
+        for t in ((range(1,int(config.samplingDDIM.forward_timesteps/step)))):  
             xt = scheduler.sample_forward_timestep(xt_1, torch.as_tensor(t).to(config.device), noise_pred, step)            
             noise_pred = model(xt, torch.as_tensor(t*step).unsqueeze(0).to(config.device))
             xt_1 = xt
@@ -90,7 +90,7 @@ def DDIM_generation(model, config, xt):
                                     beta_start=config.samplingDDIM.beta_start,
                                     beta_end=config.samplingDDIM.beta_end)
     step = config.samplingDDIM.step_backward
-    for i in tqdm(reversed(range(1,int(config.samplingDDIM.forward_timesteps/step)))):        
+    for i in (reversed(range(1,int(config.samplingDDIM.forward_timesteps/step)))):        
         # Get prediction of noise
         noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
         # Use scheduler to get x0 and xt-1

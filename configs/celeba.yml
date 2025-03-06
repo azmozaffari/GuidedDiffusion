@@ -31,7 +31,7 @@ diffusion:
     num_diffusion_timesteps: 1000
 
 sampling:
-    batch_size: 8
+    batch_size: 3
     last_only: True
     num_timesteps: 1000
 
@@ -41,17 +41,18 @@ samplingDDIM:
     beta_end: 0.02
     num_timesteps: 1000
     sigma : 0
-    forward_timesteps: 450
-    step_forward: 16
-    step_backward: 16
+    forward_timesteps: 500
+    step_forward: 6
+    step_backward: 40
 
 
 training:
     img_address: "./data/training/img"
     noisy_address: "./data/training/noisy"
     label_address: "./data/training/label"
-    n_epochs: 10
-    lr : 0.1
+    n_epochs: 6
+    batch_size : 3
+    lr : 0.000004
     checkpoints: "./data/checkpoints"
 
 

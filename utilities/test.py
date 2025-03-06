@@ -19,9 +19,12 @@ def test(finetuned_model, original_model,config, dataloader):
 
         # add noise till forward steps
         xt = DDIM_inversion(original_model, config, x0)
-           
+        # xt = torch.randn((x0.size(0),
+        #               config.data.channels,
+        #               config.data.image_size,
+        #               config.data.image_size)).to(config.device)
         generated_clean_img = DDIM_generation(finetuned_model, config, xt)
-        
+        # ims = generated_clean_img
         ims = torch.clamp(generated_clean_img, -1., 1.).detach().cpu()
         ims = (ims + 1) / 2        
         for j in range(ims.size(0)):

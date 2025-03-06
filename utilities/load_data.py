@@ -82,6 +82,7 @@ class FaceDataset(Dataset):
         img_list = os.listdir(self.root_dir+"/img")
         label_list = os.listdir(self.root_dir+"/label")
 
+       
         
         if len(img_list) == 0:
             print("Dataloader tries to load images. There is no file in the image folder")

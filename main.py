@@ -40,6 +40,7 @@ def parse_args_and_config():
     # parser.add_argument('--npy_name', type=str, required=True)
     parser.add_argument('--sample_step', type=int, default=3, help='Total sampling steps')
     parser.add_argument('--t', type=int, default=400, help='Sampling noise scale')
+    parser.add_argument('--status', type=str, default="train", help='train or test')
     args = parser.parse_args()
 
     # parse config file
@@ -115,70 +116,71 @@ def main():
     
 
     
-    # # #############  TRAIN ############################
+    # # # #############  TRAIN ############################
 
-    
-    # # define the image transformet
-    # transform = transforms.Compose([            
-    #         transforms.Resize((config.data.image_size,config.data.image_size)),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    #     ]) 
-    
-    # # call the customized data loader
-    # d = FaceDataset("./data/training", transform)
-    # dataloader = DataLoader(d, batch_size=2,
-    #                     shuffle=True, num_workers=1)
-     
-    
-    # train(model_p, config, dataloader)
-
-
-    # ################  TEST  ##########################
-
-    
-    
-    torch.cuda.empty_cache() 
-    # load finetuned model 
-    try:
-        model_f = DDPM(config)
-        # runner.image_editing_sample()
-    except Exception:
-        logging.error(traceback.format_exc())
-
-    # load pretrained weights to DDPM
-    ckpt =  torch.load("./data/checkpoints/ckpt9", weights_only=True)
-    model_f.load_state_dict(ckpt)
-    model_f.to(config.device)
-    # model = torch.nn.DataParallel(model)
-    print("Finetuned Model loaded")
+    if args.status == "train":
+        # define the image transformet
+        transform = transforms.Compose([            
+                transforms.Resize((config.data.image_size,config.data.image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ]) 
+        
+        # call the customized data loader
+        d = FaceDataset("./data/training", transform)
+        dataloader = DataLoader(d, batch_size=config.training.batch_size,
+                            shuffle=True, num_workers=1)
+        
+        
+        train(model_p, config, dataloader)
 
 
+    # # ################  TEST  ##########################
+
+    if args.status == "test":
+
+        
+        torch.cuda.empty_cache() 
+        # load finetuned model 
+        try:
+            model_f = DDPM(config)
+            # runner.image_editing_sample()
+        except Exception:
+            logging.error(traceback.format_exc())
+
+        # load pretrained weights to DDPM
+        ckpt =  torch.load("./data/checkpoints/ckpt5", weights_only=True)
+        model_f.load_state_dict(ckpt)
+        model_f.to(config.device)
+        # model = torch.nn.DataParallel(model)
+        print("Finetuned Model loaded")
 
 
 
-    # define the image transformet
-    transform = transforms.Compose([            
-            transforms.Resize((config.data.image_size,config.data.image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ]) 
-    
-    # call the customized data loader
-    d = FaceDataset("./data/test", transform)
-    dataloader = DataLoader(d, batch_size=2,
-                        shuffle=True, num_workers=1)
 
-    # The label folder of test images can be empty! No worries
 
-    
-    for param in model_p.parameters():
-        param.requires_grad = False
-    for param in model_f.parameters():
-        param.requires_grad = False
+        # define the image transformet
+        transform = transforms.Compose([            
+                transforms.Resize((config.data.image_size,config.data.image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ]) 
+        
+        # call the customized data loader
+        d = FaceDataset("./data/test", transform)
+        dataloader = DataLoader(d, batch_size=2,
+                            shuffle=True, num_workers=1)
 
-    test(model_f, model_p,config, dataloader)
-#####################################################################        
+        # The label folder of test images can be empty! No worries
+
+        
+        for param in model_p.parameters():
+            param.requires_grad = False
+        for param in model_f.parameters():
+            param.requires_grad = False
+
+        test(model_f, model_p,config, dataloader)
+# #####################################################################        
     return 0
 
 
