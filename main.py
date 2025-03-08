@@ -95,11 +95,11 @@ def main():
             ]) 
         
         # call the customized data loader
-        d_source = FaceDataset("./data/training/source", transform)
+        d_source = FaceDataset(config.training.random_source_img, transform)
         dataloader_source = DataLoader(d_source, batch_size=config.training.batch_size,
                             shuffle=True, num_workers=1)
         
-        d_target = FaceDataset("./data/training/target", transform)
+        d_target = FaceDataset(config.training.target_img, transform)
         dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
                             shuffle=True, num_workers=1)
         

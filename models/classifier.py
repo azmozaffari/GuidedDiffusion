@@ -69,7 +69,7 @@ class ClipLoss(nn.Module):
 
         # texts = ["a photo of a cat", "a photo of a dog", "a photo of a bird"]
         
-        text = ["sad"]
+        text = [self.config.training.classifier_text]
         text_tokens = clip.tokenize(text).to(self.config.device)
         # Compute the image and text features
         text_features = self.model.encode_text(text_tokens)
