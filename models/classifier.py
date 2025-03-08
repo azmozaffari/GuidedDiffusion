@@ -6,13 +6,12 @@ from models.insight_face.model_irse import Backbone, MobileFaceNet
 
 
 class IDLoss(nn.Module):
-    def __init__(self, use_mobile_id=False):        
+    def __init__(self, config):        
         super(IDLoss, self).__init__()
-        MODEL_PATHS = "./pre_trained/model_ir_se50.pth"
+        MODEL_PATHS =config.checkpoints.pretrained_classifier_FACEID
         print('Loading ResNet ArcFace')
         self.facenet = Backbone(input_size=112, num_layers=50, drop_ratio=0.6, mode='ir_se')
-        self.facenet.load_state_dict(torch.load(MODEL_PATHS, weights_only=True))
-        
+        self.facenet.load_state_dict(torch.load(MODEL_PATHS, weights_only=True))        
         self.face_pool = torch.nn.AdaptiveAvgPool2d((112, 112))
         self.facenet.eval()
 
@@ -66,7 +65,22 @@ class ClipLoss(nn.Module):
         image_features_1 = self.model.encode_image(img1).float()
         image_features_2 = self.model.encode_image(img2).float()
 
+
+
+        # texts = ["a photo of a cat", "a photo of a dog", "a photo of a bird"]
+        
+        text = ["sad"]
+        text_tokens = clip.tokenize(text).to(self.config.device)
+        # Compute the image and text features
+        text_features = self.model.encode_text(text_tokens)
+        text_features = text_features.repeat(img1.size(0),text_features.size(0))
+
+        # print(text_features.size(), image_features_1.size())
+
+    # Calculate the similarity
+        # similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+
         cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
         
         
-        return torch.mean(1-cos(image_features_1, image_features_2)) 
+        return torch.mean(1-cos(image_features_1, text_features)) 

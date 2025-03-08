@@ -11,16 +11,17 @@ from scheduler.linear_noise_scheduler import LinearNoiseScheduler,LinearNoiseSch
 
 def sampler(model, config):
     # torch.cuda.empty_cache() 
-    scheduler = LinearNoiseScheduler(num_timesteps=config.sampling.num_timesteps,
+    scheduler = LinearNoiseScheduler(num_timesteps=config.diffusion.num_timesteps,
                                      beta_start=config.diffusion.beta_start,
                                      beta_end=config.diffusion.beta_end)
+    
     model.eval()
     xt = torch.randn((1,
                       config.data.channels,
                       config.data.image_size,
                       config.data.image_size)).to(config.device)
     with torch.no_grad():
-        for i in tqdm(reversed(range(config.sampling.num_timesteps))):
+        for i in tqdm(reversed(range(config.diffusion.num_timesteps))):
             # Get prediction of noise
             noise_pred = model(xt, torch.as_tensor(i).unsqueeze(0).to(config.device))
             
@@ -49,10 +50,9 @@ def sampler(model, config):
     
 
 def DDIM_inversion(model, config, x0):
-    scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.num_timesteps,
+    scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.DDPM_num_timesteps,
                                     beta_start=config.samplingDDIM.beta_start,
-                                    beta_end=config.samplingDDIM.beta_end)
-    
+                                    beta_end=config.samplingDDIM.beta_end)   
     
     
     # generate random gaussian noise and add it to the original image
@@ -67,10 +67,10 @@ def DDIM_inversion(model, config, x0):
     
     # starting point is x1 that we want to add noise to it and make x2 and so on
     xt_1 = x1
-    step = config.samplingDDIM.step_forward
+    step = config.samplingDDIM.stepsize_forward
     with torch.no_grad():
         
-        for t in ((range(1,int(config.samplingDDIM.forward_timesteps/step)))):  
+        for t in ((range(1,int(config.samplingDDIM.t/step)))):  
             xt = scheduler.sample_forward_timestep(xt_1, torch.as_tensor(t).to(config.device), noise_pred, step)            
             noise_pred = model(xt, torch.as_tensor(t*step).unsqueeze(0).to(config.device))
             xt_1 = xt
@@ -89,36 +89,15 @@ def DDIM_generation(model, config, xt):
     scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.num_timesteps,
                                     beta_start=config.samplingDDIM.beta_start,
                                     beta_end=config.samplingDDIM.beta_end)
-    step = config.samplingDDIM.step_backward
-    for i in (reversed(range(1,int(config.samplingDDIM.forward_timesteps/step)))):        
+    step = config.samplingDDIM.stepsize_backward
+    for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):        
         # Get prediction of noise
         noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
         # Use scheduler to get x0 and xt-1
         xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
-        xt = xt_1
-
-
-
-
-
-        # ims = torch.clamp(xt, -1., 1.).detach().cpu()
-        # ims = (ims + 1) / 2
-        # ims = ims.squeeze(0)    
-        # img = torchvision.transforms.ToPILImage()(ims)
-
-
-
-
-
-        # if not os.path.exists(config.test.generated_address):
-        #     os.mkdir(config.test.generated_address)    
-        # img.save(os.path.join(config.test.generated_address, str(i)+".jpg"))
-        # img.close()
+        xt = xt_1        
     
-   
-    
-    return xt
-
+    return x0_pred
 
 
 

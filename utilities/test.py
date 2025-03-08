@@ -11,10 +11,11 @@ def test(finetuned_model, original_model,config, dataloader):
 
     
     
-    for img, img_name, label, label_name in dataloader:
+    for img, img_name in dataloader:
         # this line can be replaced with the dataloader
         
        
+        
         x0 = img.to(config.device)
 
         # add noise till forward steps

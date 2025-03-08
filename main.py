@@ -1,6 +1,5 @@
 import argparse
 import traceback
-import logging
 import yaml
 import sys
 import os
@@ -48,25 +47,11 @@ def parse_args_and_config():
         config = yaml.safe_load(f)
     new_config = dict2namespace(config)
 
-    level = getattr(logging, args.verbose.upper(), None)
-    if not isinstance(level, int):
-        raise ValueError('level {} not supported'.format(args.verbose))
-
-    handler1 = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)s - %(filename)s - %(asctime)s - %(message)s')
-    handler1.setFormatter(formatter)
-    logger = logging.getLogger()
-    logger.addHandler(handler1)
-    logger.setLevel(level)
-
-   
-
     # add device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    logging.info("Using device: {}".format(device))
     new_config.device = device
 
-    # set random seed
+    # ---------------- set random seed -----------------------------------------------
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
     if torch.cuda.is_available():
@@ -89,34 +74,17 @@ def dict2namespace(config):
 
 
 def main():
-    args, config = parse_args_and_config()
-    print(">" * 80)
-    logging.info("Exp instance id = {}".format(os.getpid()))
-    logging.info("Exp comment = {}".format(args.comment))
-    logging.info("Config =")
-    print("<" * 80)
+    args, config = parse_args_and_config()   
 
 
 # load pretrained checkpoints for face generation model
-    try:
-        model_p = DDPM(config)
-        # runner.image_editing_sample()
-    except Exception:
-        logging.error(traceback.format_exc())
-
-
-    # load pretrained weights to DDPM
-    ckpt =  torch.load("./pre_trained/celeba_hq.ckpt", weights_only=True)
-    model_p.load_state_dict(ckpt)
-    model_p.to(config.device)
-    # model = torch.nn.DataParallel(model)
-    print("Pretrained Model loaded")
-
-
+    model_pretrained = DDPM(config)
+    ckpt =  torch.load(config.checkpoints.pretrained_diffusion_checkpoint, weights_only=True)
+    model_pretrained.load_state_dict(ckpt)
+    model_pretrained.to(config.device)
+    print("Pretrained diffusion model loaded")
     
-
-    
-    # # # #############  TRAIN ############################
+# ------------------  TRAIN ----------------------------
 
     if args.status == "train":
         # define the image transformet
@@ -127,59 +95,62 @@ def main():
             ]) 
         
         # call the customized data loader
-        d = FaceDataset("./data/training", transform)
-        dataloader = DataLoader(d, batch_size=config.training.batch_size,
+        d_source = FaceDataset("./data/training/source", transform)
+        dataloader_source = DataLoader(d_source, batch_size=config.training.batch_size,
+                            shuffle=True, num_workers=1)
+        
+        d_target = FaceDataset("./data/training/target", transform)
+        dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
                             shuffle=True, num_workers=1)
         
         
-        train(model_p, config, dataloader)
+        train(model_pretrained, config, dataloader_source, dataloader_target)
 
 
-    # # ################  TEST  ##########################
+# # --------------------- TEST -----------------------------
 
-    if args.status == "test":
-
-        
-        torch.cuda.empty_cache() 
-        # load finetuned model 
-        try:
-            model_f = DDPM(config)
-            # runner.image_editing_sample()
-        except Exception:
-            logging.error(traceback.format_exc())
-
-        # load pretrained weights to DDPM
-        ckpt =  torch.load("./data/checkpoints/ckpt5", weights_only=True)
-        model_f.load_state_dict(ckpt)
-        model_f.to(config.device)
-        # model = torch.nn.DataParallel(model)
-        print("Finetuned Model loaded")
-
-
-
-
-
-        # define the image transformet
-        transform = transforms.Compose([            
-                transforms.Resize((config.data.image_size,config.data.image_size)),
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ]) 
-        
-        # call the customized data loader
-        d = FaceDataset("./data/test", transform)
-        dataloader = DataLoader(d, batch_size=2,
-                            shuffle=True, num_workers=1)
-
-        # The label folder of test images can be empty! No worries
+#     if args.status == "test":
 
         
-        for param in model_p.parameters():
-            param.requires_grad = False
-        for param in model_f.parameters():
-            param.requires_grad = False
+#         torch.cuda.empty_cache() 
+#         # load finetuned model 
+#         try:
+#             model_f = DDPM(config)
+#             # runner.image_editing_sample()
+#         except Exception:
+#             logging.error(traceback.format_exc())
 
-        test(model_f, model_p,config, dataloader)
+#         # load pretrained weights to DDPM
+#         ckpt =  torch.load("./data/checkpoints/ckpt19", weights_only=True)
+#         model_f.load_state_dict(ckpt)
+#         model_f.to(config.device)
+#         print("Finetuned Model loaded")
+
+
+
+
+
+#         # define the image transformet
+#         transform = transforms.Compose([            
+#                 transforms.Resize((config.data.image_size,config.data.image_size)),
+#                 transforms.ToTensor(),
+#                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+#             ]) 
+        
+#         # call the customized data loader
+#         d = FaceDataset("./data/test", transform)
+#         dataloader = DataLoader(d, batch_size=2,
+#                             shuffle=True, num_workers=1)
+
+#         # The label folder of test images can be empty! No worries
+
+        
+#         for param in model_p.parameters():
+#             param.requires_grad = False
+#         for param in model_f.parameters():
+#             param.requires_grad = False
+
+#         test(model_f, model_p,config, dataloader)
 # #####################################################################        
     return 0
 

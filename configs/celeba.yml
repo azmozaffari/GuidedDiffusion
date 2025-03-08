@@ -1,15 +1,8 @@
 data:
     dataset: "CelebA_HQ"
-    category: "bedroom"
     image_size: 256
     channels: 3
-    logit_transform: false
-    uniform_dequantization: false
-    gaussian_dequantization: false
-    random_flip: true
-    rescaled: true
-    num_workers: 32
-
+    
 model:
     type: "simple"
     in_channels: 3
@@ -26,37 +19,34 @@ model:
 
 diffusion:
     beta_schedule: linear
+    num_timesteps: 1000
     beta_start: 0.0001
     beta_end: 0.02
-    num_diffusion_timesteps: 1000
-
-sampling:
-    batch_size: 3
-    last_only: True
-    num_timesteps: 1000
 
 samplingDDIM:
     beta_schedule: linear
     beta_start: 0.0001
     beta_end: 0.02
-    num_timesteps: 1000
+    DDPM_num_timesteps: 1000 
     sigma : 0
-    forward_timesteps: 500
-    step_forward: 6
-    step_backward: 40
+    t : 500 ###  The maximum time steps for inversion and denoising in DDIM
+    stepsize_forward: 10 
+    stepsize_backward: 50  
 
 
 training:
-    img_address: "./data/training/img"
-    noisy_address: "./data/training/noisy"
-    label_address: "./data/training/label"
-    n_epochs: 6
-    batch_size : 3
+    random_source_img: "./data/training/source"
+    target_img: "./data/training/target"
+    output_img: "./data/training/output"
+    n_epochs: 5
+    batch_size : 6
     lr : 0.000004
-    checkpoints: "./data/checkpoints"
 
 
-test:
-    img_address: "./data/test/img"
-    noisy_address: "./data/test/noisy"
-    gen_img_address: "./data/test/generated"
+checkpoints:
+    pretrained_diffusion_checkpoint: "./pre_trained/celeba_hq.ckpt"
+    finetuned_diffusion_checkpoints: "./data/checkpoints"
+    pretrained_classifier_FACEID: ./pre_trained/model_ir_se50.pth
+
+
+
