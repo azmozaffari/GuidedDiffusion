@@ -3,6 +3,7 @@ import clip
 import torch.nn as nn
 # from configs.paths_config import MODEL_PATHS
 from models.insight_face.model_irse import Backbone, MobileFaceNet
+from models.emonet import emonet
 
 
 class IDLoss(nn.Module):
@@ -84,3 +85,31 @@ class ClipLoss(nn.Module):
         
         
         return torch.mean(1-cos(image_features_1, text_features)) 
+    
+
+
+class EmoNet(nn.Module):
+
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        MODEL_PATHS = config.checkpoints.pretrained_classifier_emonet
+        self.model = emonet(n_expression=5).to(config.device)
+        state_dict = torch.load(MODEL_PATHS, weights_only=True, map_location=config.device)
+        state_dict = {k.replace('module.',''):v for k,v in state_dict.items()}
+        self.model.load_state_dict(state_dict, strict=False)
+        self.model.eval()
+        for param in self.model.parameters():
+            param.requiers_grad = False
+    
+
+    def forward(self, img, emotion):
+        
+        output =self.model(img)
+        emotion_value = 1 - nn.functional.softmax(output["expression"]/2, dim=1)[:,emotion]
+        #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust", 6:"Anger", 7:"Contempt"}
+        return torch.mean(emotion_value)
+
+        
+    
+

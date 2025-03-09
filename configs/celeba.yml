@@ -38,7 +38,7 @@ training:
     random_source_img: "./data/training/source"
     target_img: "./data/training/target"
     output_img: "./data/training/output"
-    n_epochs: 3
+    n_epochs: 60
     batch_size : 6
     lr : 0.000004
     classifier_text : "shocked"
@@ -49,6 +49,7 @@ checkpoints:
     pretrained_diffusion_checkpoint: "./pre_trained/celeba_hq.ckpt"
     finetuned_diffusion_checkpoints: "./data/checkpoints"
     pretrained_classifier_FACEID: ./pre_trained/model_ir_se50.pth
+    pretrained_classifier_emonet: ./pre_trained/emonet_5.pth
 
 
 

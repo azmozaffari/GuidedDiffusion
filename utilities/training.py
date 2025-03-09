@@ -28,6 +28,7 @@ def train(model, config, dataloader_source, dataloader_target):
     loss_clip = ClipLoss(config)
     loss_id = IDLoss(config)
     loss_mse = nn.MSELoss()
+    loss_emotion = EmoNet(config)
 
     model_ = model    
     # model.attribute = list(model.attribute)  # where attribute was dict_keys
@@ -84,7 +85,8 @@ def train(model, config, dataloader_source, dataloader_target):
                 noisy_img = xt_1 
                        
                 # loss and backpropagation
-                l_1 = loss_clip(x0_pred, img)
+                # l_1 = loss_clip(x0_pred, img)
+                l_1 = loss_emotion(x0_pred,4) # emotion fear
                 l_2 = loss_id(x0_pred,img )
                 l_3 = loss_mse(x0_pred, img)
                 l =  (l_1 + l_2 + l_3)
@@ -95,6 +97,12 @@ def train(model, config, dataloader_source, dataloader_target):
                 optimizer.step()
             # we break the gradient tree in every cycly to have efficient gpu training version
                 noisy_img = noisy_img.clone().detach().requires_grad_(False)
+
+
+
+            if not os.path.exists(os.path.join(config.training.output_img,str(epoch))):
+                os.makedirs(os.path.join(config.training.output_img,str(epoch)))
+
             ims = torch.clamp(x0_pred, -1., 1.).detach().cpu()
             ims = (ims + 1) / 2        
             for j in range(ims.size(0)):
