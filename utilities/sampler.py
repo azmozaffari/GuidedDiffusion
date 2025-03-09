@@ -84,17 +84,21 @@ def DDIM_inversion(model, config, x0):
 
 
 def DDIM_generation(model, config, xt):
-   
+   # pay attention to value sigma
+   # if you want exactly the same sample generated from the forward path consider sigma = 0
 
-    scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.num_timesteps,
+    scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.DDPM_num_timesteps,
                                     beta_start=config.samplingDDIM.beta_start,
                                     beta_end=config.samplingDDIM.beta_end)
     step = config.samplingDDIM.stepsize_backward
+
+    sigma_ = config.samplingDDIM.sigma
     for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):        
         # Get prediction of noise
+        sigma = sigma_ * 0.08 * i
         noise_pred = model(xt, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
         # Use scheduler to get x0 and xt-1
-        xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
+        xt_1, x0_pred = scheduler.sample_prev_timestep(xt, noise_pred, torch.as_tensor(i).to(config.device),sigma , step)
         xt = xt_1        
     
     return x0_pred

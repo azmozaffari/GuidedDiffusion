@@ -151,7 +151,56 @@ def main():
 #             param.requires_grad = False
 
 #         test(model_f, model_p,config, dataloader)
-# #####################################################################        
+#       
+# --------------------   DDIM Generating Random samples  -----------------------------
+    
+
+
+    if args.status == "generate":
+        # generate samples from DDIM process with sigma != 0
+        for param in model_pretrained.parameters():
+                param.requires_grad = False
+
+
+        transform = transforms.Compose([            
+                        transforms.Resize((config.data.image_size,config.data.image_size)),
+                        transforms.ToTensor(),
+                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                    ]) 
+                
+                
+        d_target = FaceDataset(config.training.target_img, transform)
+        dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
+                                    shuffle=True, num_workers=1)
+
+
+        for img,_,  in dataloader_target:
+                    img = img.to(config.device)  
+                    noisy_img = DDIM_inversion(model_pretrained, config, img)
+                    noisy_img = noisy_img.to(config.device)
+                    x0_pred = DDIM_generation(model_pretrained, config, noisy_img)
+
+
+                    ims = torch.clamp(x0_pred, -1., 1.).detach().cpu()
+                    ims = (ims + 1) / 2        
+                    for j in range(ims.size(0)):
+                        torchvision.utils.save_image(ims[j, :, :, :], os.path.join(config.training.random_source_img,"3"+_[j]))         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return 0
 
 

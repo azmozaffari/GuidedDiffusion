@@ -48,11 +48,11 @@ def train(model, config, dataloader_source, dataloader_target):
             noisy_img = DDIM_inversion(model_, config, img)
             noisy_img = noisy_img.to(config.device)
             for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):      
-
+                sigma = config.samplingDDIM.sigma * 0.08 * i
                 # Get prediction of noise
                 noise_pred = model(noisy_img, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
                 # Use scheduler to get x0 and xt-1
-                xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
+                xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), sigma, step)
                 noisy_img = xt_1 
                 
                 # loss and backpropagation
@@ -77,19 +77,19 @@ def train(model, config, dataloader_source, dataloader_target):
             noisy_img = DDIM_inversion(model_, config, img)
             noisy_img = noisy_img.to(config.device)
             for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):      
-
+                sigma = config.samplingDDIM.sigma * 0.08 * i
                 # Get prediction of noise
                 noise_pred = model(noisy_img, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
                 # Use scheduler to get x0 and xt-1
-                xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), config.samplingDDIM.sigma, step)
+                xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), sigma, step)
                 noisy_img = xt_1 
                        
                 # loss and backpropagation
-                # l_1 = loss_clip(x0_pred, img)
-                l_1 = loss_emotion(x0_pred,4) # emotion fear
+                l_1 = loss_clip(x0_pred, img, config.training.classifier_text)
+                # l_1 = loss_emotion(x0_pred,4) # emotion fear
                 l_2 = loss_id(x0_pred,img )
                 l_3 = loss_mse(x0_pred, img)
-                l =  (l_1 + l_2 + l_3)
+                l =  (0.1* l_1 + l_2 + l_3)
                 total_loss[i] = l.data 
                 optimizer.zero_grad()
                 l.backward()

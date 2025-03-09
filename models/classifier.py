@@ -55,7 +55,7 @@ class ClipLoss(nn.Module):
 
 
     
-    def forward(self,img1, img2):
+    def forward(self,img1, img2, text):
         img1 = img1.to(self.config.device)
         img2 = img2.to(self.config.device)
         
@@ -70,7 +70,7 @@ class ClipLoss(nn.Module):
 
         # texts = ["a photo of a cat", "a photo of a dog", "a photo of a bird"]
         
-        text = [self.config.training.classifier_text]
+        text = [text]
         text_tokens = clip.tokenize(text).to(self.config.device)
         # Compute the image and text features
         text_features = self.model.encode_text(text_tokens)
@@ -101,6 +101,8 @@ class EmoNet(nn.Module):
         self.model.eval()
         for param in self.model.parameters():
             param.requiers_grad = False
+
+        print("Emonet model is loaded")
     
 
     def forward(self, img, emotion):
