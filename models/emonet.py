@@ -219,7 +219,7 @@ class emonet(nn.Module):
                 self.temporal_state[:,-1,:] = final_features 
                 final_features = torch.sum(self.temporal_weights*self.temporal_state, dim=1)
 
-        return {'heatmap': tmp_out, 'expression': final_features[:,:-2], 'valence': final_features[:,-2], 'arousal':final_features[:,-1]}
+        return {'heatmap': tmp_out, 'expression': final_features[:,:-2], 'valence': final_features[:,-2], 'arousal':final_features[:,-1]}, emo_feat
 
   
     def eval(self):

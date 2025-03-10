@@ -11,7 +11,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 import torchvision
 import copy
 
-def train(model, config, dataloader_source, dataloader_target):
+def train(model, config, dataloader_source, dataloader_target, dataloader_pillar):
     torch.cuda.empty_cache() 
     n_epochs = config.training.n_epochs
     scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.DDPM_num_timesteps,
@@ -36,6 +36,15 @@ def train(model, config, dataloader_source, dataloader_target):
     
     
     model.train()
+
+    # read the pilar image samples and take average of features 
+    
+    for img,_,  in dataloader_pillar:
+        img = img.to(config.device)
+        _l, feat = loss_emotion(img,2) #
+    
+    mean_feat = torch.mean(feat,0)
+
     
     for epoch in range(n_epochs):
        
@@ -85,11 +94,19 @@ def train(model, config, dataloader_source, dataloader_target):
                 noisy_img = xt_1 
                        
                 # loss and backpropagation
-                l_1 = loss_clip(x0_pred, img, config.training.classifier_text)
-                # l_1 = loss_emotion(x0_pred,4) # emotion fear
+                # l_1 = loss_clip(x0_pred, img, config.training.classifier_text)
+                l_1, feat = loss_emotion(x0_pred,2) #        #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust", 6:"Anger", 7:"Contempt"}
+                m_f = mean_feat.repeat(feat.size(0),1,1,1)
+
+
+                l_pillar = 1- torch.sum((feat*m_f))/(torch.norm(feat)*torch.norm(m_f))
+
+
+                print("feature",l_pillar.item(), l_1.item())   
+
                 l_2 = loss_id(x0_pred,img )
                 l_3 = loss_mse(x0_pred, img)
-                l =  (0.1* l_1 + l_2 + l_3)
+                l =  (l_1+ l_pillar + l_2 + l_3) #0.1*l_1 for clip
                 total_loss[i] = l.data 
                 optimizer.zero_grad()
                 l.backward()

@@ -103,8 +103,14 @@ def main():
         dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
                             shuffle=True, num_workers=1)
         
+
+        d_pillar =FaceDataset(config.training.pillar_img, transform)
+        dataloader_pillar = DataLoader(d_pillar, batch_size=config.training.batch_size,
+                            shuffle=True, num_workers=1)
         
-        train(model_pretrained, config, dataloader_source, dataloader_target)
+        
+        
+        train(model_pretrained, config, dataloader_source, dataloader_target, dataloader_pillar)
 
 
 # # --------------------- TEST -----------------------------

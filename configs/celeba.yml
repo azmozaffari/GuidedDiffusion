@@ -28,7 +28,7 @@ samplingDDIM:
     beta_start: 0.0001
     beta_end: 0.02
     DDPM_num_timesteps: 1000 
-    sigma : 0.0051   # generate random source samples with sigma 0.008 0.006 and 0.005
+    sigma : 0.00   # generate random source samples with sigma 0.008 0.006 and 0.005
     t : 500 ###  The maximum time steps for inversion and denoising in DDIM
     stepsize_forward: 10 
     stepsize_backward: 50  
@@ -38,7 +38,8 @@ training:
     random_source_img: "./data/training/source"
     target_img: "./data/training/target"
     output_img: "./data/training/output"
-    n_epochs: 3
+    pillar_img: "./data/training/pillar"
+    n_epochs: 10
     batch_size : 6
     lr : 0.000004
     classifier_text : "sad"

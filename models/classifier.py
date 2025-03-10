@@ -107,10 +107,10 @@ class EmoNet(nn.Module):
 
     def forward(self, img, emotion):
         
-        output =self.model(img)
-        emotion_value = 1 - nn.functional.softmax(output["expression"]/2, dim=1)[:,emotion]
+        output, feature =self.model(img)
+        emotion_value = 1 - nn.functional.softmax(output["expression"]/2, dim=1)[:,emotion]  # dividing the softmax output by T>1 helps to have more calibrated confidence results and can help the model to learn better adversaries to guid image generation 
         #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust", 6:"Anger", 7:"Contempt"}
-        return torch.mean(emotion_value)
+        return torch.mean(emotion_value), feature
 
         
     

@@ -12,7 +12,6 @@ from torchvision import transforms, utils
 
 
 class FaceDataset(Dataset):
-    """source image, noisy image and target image."""
 
     def __init__(self,root_dir, transform=None):
         """
@@ -48,3 +47,5 @@ class FaceDataset(Dataset):
             img_name = img_list[idx]     
 
         return img, img_name
+
+
