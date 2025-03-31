@@ -39,10 +39,13 @@ training:
     target_img: "./data/training/target"
     output_img: "./data/training/output"
     pillar_img: "./data/training/pillar"
-    n_epochs: 10
+    n_epochs: 20
     batch_size : 6
     lr : 0.000004
-    classifier_text : "sad"
+    clip_classifier_text_source : "face"
+    clip_classifier_text_target : " a german flag"
+    use_finetuned_classifier: "off"  # or on
+    ref_img: "./data/training/ref_img.jpg"
 
 
 
@@ -51,6 +54,7 @@ checkpoints:
     finetuned_diffusion_checkpoints: "./data/checkpoints"
     pretrained_classifier_FACEID: ./pre_trained/model_ir_se50.pth
     pretrained_classifier_emonet: ./pre_trained/emonet_5.pth
+    pretrained_classifier_clip: "./pre_trained/5clip_finetuned.pth"
 
 
 

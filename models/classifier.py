@@ -4,7 +4,7 @@ import torch.nn as nn
 # from configs.paths_config import MODEL_PATHS
 from models.insight_face.model_irse import Backbone, MobileFaceNet
 from models.emonet import emonet
-
+from transformers import CLIPModel, CLIPProcessor
 
 class IDLoss(nn.Module):
     def __init__(self, config):        
@@ -45,6 +45,13 @@ class ClipLoss(nn.Module):
     def __init__(self,config):
         super().__init__()
         self.model, self.preprocess = clip.load("ViT-B/32",device=config.device)
+        if config.training.use_finetuned_classifier == "on":
+            model_path = config.checkpoints.pretrained_classifier_clip  # Replace with the actual path  
+            self.model.load_state_dict(torch.load(model_path, weights_only=True))
+            
+        
+        
+        
         self.preprocess.transforms.pop(2)
         self.preprocess.transforms.pop(2)
         self.config = config
@@ -55,36 +62,50 @@ class ClipLoss(nn.Module):
 
 
     
-    def forward(self,img1, img2, text):
-        img1 = img1.to(self.config.device)
-        img2 = img2.to(self.config.device)
+    def forward(self,img_source, img_generated, text_source, text_target):
+        img_source = img_source.to(self.config.device)
+        img_generated = img_generated.to(self.config.device)
         
-        img1 = self.preprocess(img1)
-        img2 = self.preprocess(img2)
+        img_source = self.preprocess(img_source)
+        img_generated = self.preprocess(img_generated)
         
        
-        image_features_1 = self.model.encode_image(img1).float()
-        image_features_2 = self.model.encode_image(img2).float()
+        image_features_source = self.model.encode_image(img_source).float()
+        image_features_generated = self.model.encode_image(img_generated).float()
 
 
 
         # texts = ["a photo of a cat", "a photo of a dog", "a photo of a bird"]
         
-        text = [text]
-        text_tokens = clip.tokenize(text).to(self.config.device)
+        text_s = [text_source]
+        text_t = [text_target]
+
+        text_tokens_source = clip.tokenize(text_s).to(self.config.device)
+        text_tokens_target = clip.tokenize(text_t).to(self.config.device)
+        
         # Compute the image and text features
-        text_features = self.model.encode_text(text_tokens)
-        text_features = text_features.repeat(img1.size(0),text_features.size(0))
+        text_features_s = self.model.encode_text(text_tokens_source)
+        text_features_t = self.model.encode_text(text_tokens_target)
+        
+        
+        text_features_s = text_features_s.repeat(img_source.size(0),text_features_s.size(0))
+        text_features_t = text_features_t.repeat(img_source.size(0),text_features_t.size(0))
 
         # print(text_features.size(), image_features_1.size())
 
     # Calculate the similarity
         # similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
 
+        
+        delta_T = text_features_t - text_features_s
+        delta_I = image_features_generated - image_features_source
+        
+        
         cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
         
         
-        return torch.mean(1-cos(image_features_1, text_features)) 
+        return torch.mean(1 - (cos(delta_I, delta_T)/delta_I.norm(dim=1, p=2) * delta_T.norm(dim=1, p=2)))
+     
     
 
 

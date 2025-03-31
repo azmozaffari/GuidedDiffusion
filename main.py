@@ -40,6 +40,7 @@ def parse_args_and_config():
     parser.add_argument('--sample_step', type=int, default=3, help='Total sampling steps')
     parser.add_argument('--t', type=int, default=400, help='Sampling noise scale')
     parser.add_argument('--status', type=str, default="train", help='train or test')
+    parser.add_argument('--finetuned_classifier', type=str, default="off", help='off or on to use finetuned classifier')
     args = parser.parse_args()
 
     # parse config file
@@ -78,6 +79,7 @@ def main():
 
 
 # load pretrained checkpoints for face generation model
+    config.training.use_finetuned_classifier = args.finetuned_classifier
     model_pretrained = DDPM(config)
     ckpt =  torch.load(config.checkpoints.pretrained_diffusion_checkpoint, weights_only=True)
     model_pretrained.load_state_dict(ckpt)

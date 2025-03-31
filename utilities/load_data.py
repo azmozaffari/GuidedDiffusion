@@ -42,7 +42,7 @@ class FaceDataset(Dataset):
             img_name = ""
         else:
             img_add = os.path.join(self.root_dir, img_list[idx])  
-            img = Image.open(img_add)
+            img = Image.open(img_add).convert("RGB")
             img = self.transform(img) 
             img_name = img_list[idx]     
 

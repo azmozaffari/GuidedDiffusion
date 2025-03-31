@@ -12,6 +12,21 @@ import torchvision
 import copy
 
 def train(model, config, dataloader_source, dataloader_target, dataloader_pillar):
+    # read ref image
+    img_ref = Image.open(config.training.ref_img).convert("RGB")
+    transform = transforms.Compose([            
+                transforms.Resize((256,256)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ]) 
+
+    img_ref = transform(img_ref)
+    img_ref = img_ref.unsqueeze(0)
+
+
+    # img_ref = img_ref.to(config.device) 
+
+
     torch.cuda.empty_cache() 
     n_epochs = config.training.n_epochs
     scheduler = LinearNoiseSchedulerDDIM(num_timesteps=config.samplingDDIM.DDPM_num_timesteps,
@@ -23,7 +38,7 @@ def train(model, config, dataloader_source, dataloader_target, dataloader_pillar
     
     lr_schedul = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=1.2) #lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=1.2, total_iters=50)
     
-    max_norm = 0.01  # Define the max gradient value for each parameter
+    max_norm = 1  # Define the max gradient value for each parameter
 
     loss_clip = ClipLoss(config)
     loss_id = IDLoss(config)
@@ -48,32 +63,32 @@ def train(model, config, dataloader_source, dataloader_target, dataloader_pillar
     
     for epoch in range(n_epochs):
        
-        total_loss = 0
-        batch_size = 0
-        total_loss = [0]*int(config.samplingDDIM.t/step)
-        for img,_,  in dataloader_source:
-            batch_size += img.size(0) 
-            img = img.to(config.device)  
-            noisy_img = DDIM_inversion(model_, config, img)
-            noisy_img = noisy_img.to(config.device)
-            for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):      
-                sigma = config.samplingDDIM.sigma * 0.08 * i
-                # Get prediction of noise
-                noise_pred = model(noisy_img, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
-                # Use scheduler to get x0 and xt-1
-                xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), sigma, step)
-                noisy_img = xt_1 
+        # total_loss = 0
+        # batch_size = 0
+        # total_loss = [0]*int(config.samplingDDIM.t/step)
+        # for img,_,  in dataloader_source:
+        #     batch_size += img.size(0) 
+        #     img = img.to(config.device)  
+        #     noisy_img = DDIM_inversion(model_, config, img)
+        #     noisy_img = noisy_img.to(config.device)
+        #     for i in (reversed(range(1,int(config.samplingDDIM.t/step)))):      
+        #         sigma = config.samplingDDIM.sigma * 0.08 * i
+        #         # Get prediction of noise
+        #         noise_pred = model(noisy_img, torch.as_tensor(i*step).unsqueeze(0).to(config.device))        
+        #         # Use scheduler to get x0 and xt-1
+        #         xt_1, x0_pred = scheduler.sample_prev_timestep(noisy_img, noise_pred, torch.as_tensor(i).to(config.device), sigma, step)
+        #         noisy_img = xt_1 
                 
-                # loss and backpropagation
-                l_2 = loss_id(x0_pred,img )
-                l_3 = loss_mse(x0_pred, img)
-                l = l_2 + l_3
-                total_loss[i] = l.data 
-                optimizer.zero_grad()
-                l.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
-                optimizer.step()
-                noisy_img = noisy_img.clone().detach().requires_grad_(False)
+        #         # loss and backpropagation
+        #         l_2 = loss_id(x0_pred,img )
+        #         l_3 = loss_mse(x0_pred, img)
+        #         l =  l_2 + l_3
+        #         total_loss[i] = l.data 
+        #         optimizer.zero_grad()
+        #         l.backward()
+        #         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
+        #         optimizer.step()
+        #         noisy_img = noisy_img.clone().detach().requires_grad_(False)
                     
 
         total_loss = 0
@@ -94,19 +109,21 @@ def train(model, config, dataloader_source, dataloader_target, dataloader_pillar
                 noisy_img = xt_1 
                        
                 # loss and backpropagation
-                # l_1 = loss_clip(x0_pred, img, config.training.classifier_text)
-                l_1, feat = loss_emotion(x0_pred,2) #        #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust", 6:"Anger", 7:"Contempt"}
-                m_f = mean_feat.repeat(feat.size(0),1,1,1)
+                img_ref_ = img.repeat(x0_pred.size(0),1,1,1)
+                # print(x0_pred.size(), img_ref.size())
+                l_1 = loss_clip( img, x0_pred, config.training.clip_classifier_text_source, config.training.clip_classifier_text_target )
+                # l_1, feat = loss_emotion(x0_pred,2) #        #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust", 6:"Anger", 7:"Contempt"}
+                # m_f = mean_feat.repeat(feat.size(0),1,1,1)
 
 
-                l_pillar = 1- torch.sum((feat*m_f))/(torch.norm(feat)*torch.norm(m_f))
+                # l_pillar = 1- torch.sum((feat*m_f))/(torch.norm(feat)*torch.norm(m_f))
 
 
-                print("feature",l_pillar.item(), l_1.item())   
+                # print("feature",l_pillar.item(), l_1.item())   
 
                 l_2 = loss_id(x0_pred,img )
                 l_3 = loss_mse(x0_pred, img)
-                l =  (l_1+ l_pillar + l_2 + l_3) #0.1*l_1 for clip
+                l =  (l_1 + l_2 + l_3) #0.1*l_1 for clip
                 total_loss[i] = l.data 
                 optimizer.zero_grad()
                 l.backward()
@@ -116,14 +133,15 @@ def train(model, config, dataloader_source, dataloader_target, dataloader_pillar
                 noisy_img = noisy_img.clone().detach().requires_grad_(False)
 
 
-
             if not os.path.exists(os.path.join(config.training.output_img,str(epoch))):
                 os.makedirs(os.path.join(config.training.output_img,str(epoch)))
 
             ims = torch.clamp(x0_pred, -1., 1.).detach().cpu()
             ims = (ims + 1) / 2        
             for j in range(ims.size(0)):
-                torchvision.utils.save_image(ims[j, :, :, :], os.path.join(config.training.output_img,str(epoch),_[j]))              
+                torchvision.utils.save_image(ims[j, :, :, :], os.path.join(config.training.output_img,str(epoch),_[j]))   
+        # optimizer.step()
+           
         lr_schedul.step()
 
 
