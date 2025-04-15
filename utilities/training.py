@@ -37,6 +37,7 @@ def train(model, config, dataloader_target):
     loss_id = IDLoss(config)
     loss_mse = nn.MSELoss()
     loss_emotion = EmoNet(config)
+    
     # we need two copies of the model, one for the DDIM forward process to generate noise
     # and one for the backward process as the denoiser that we want to finetune for each sample
 
@@ -68,7 +69,11 @@ def train(model, config, dataloader_target):
                        
                 # loss and backpropagation
                 
-                l_1 = loss_clip( img, x0_pred, config.training.clip_classifier_text_source, config.training.clip_classifier_text_target )
+                if config.classifier == "clip":
+                    l_1 = loss_clip( img, x0_pred, config.training.clip_classifier_text_source, config.training.clip_classifier_text_target )
+                
+                if config.classifier == "emonet":
+                    l_1 = loss_emotion(x0_pred,config.training.emonet_emotion)  
                 l_2 = loss_id(x0_pred,img )
                 l_3 = loss_mse(x0_pred, img)
                 l =  (l_1 + l_2 + l_3) #0.1*l_1 for clip

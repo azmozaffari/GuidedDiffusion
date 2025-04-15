@@ -42,7 +42,8 @@ training:
     batch_size : 6
     lr : 0.000004
     clip_classifier_text_source : "face "
-    clip_classifier_text_target : "Angry face"
+    clip_classifier_text_target : "Fear face"
+    emonet_emotion: 4 #emotion_classes = {0:"Neutral", 1:"Happy", 2:"Sad", 3:"Surprise", 4:"Fear", 5:"Disgust"}                
     use_finetuned_classifier: "off"  # or on
     ref_img: "./data/training/ref_img.jpg"
 
@@ -55,4 +56,4 @@ checkpoints:
     finetuned_diffusion_checkpoints: ./data/checkpoints   # where to save the fine-tuned weights
 
 
-
+classifier: clip  # clip / emonet
