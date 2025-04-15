@@ -8,7 +8,7 @@ In order to use less GPU resources, the GPU-efficient fine-tunning approach is o
 
 I also compare the generative results, in the case of using Emonet versus CLIP to guide the diffusion model.
 
-A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP)
+A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation.
 # Quick Start
 
 * Create a new conda environment with python 3.8 then run below commands
