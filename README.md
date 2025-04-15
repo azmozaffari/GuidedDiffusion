@@ -8,7 +8,8 @@ In order to use less GPU resources, the GPU-efficient fine-tunning approach is o
 
 I also compare the generative results, in the case of using Emonet versus CLIP to guide the diffusion model.
 
-A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation.
+A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation. The DDPM implementation is downloaded from [https://github.com/explainingai-code/DDPM-Pytorch/tree/main](https://github.com/explainingai-code/DDPM-Pytorch/tree/main).
+
 # Quick Start
 
 * Create a new conda environment with python 3.8 then run below commands
@@ -19,15 +20,14 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 
 * pip install -r requirements.txt
 
-* For training/inference use the below commands passing the desired configuration file as the config argument in case you want to play with it.
+* Run the batch file run.sh by ./run.sh
 
-* python3 main.py --config "path/to/config/file" --mode training       for training ddpm
+* The target image folder is in ./data/training/target. Drop some CelebA images in this folder
 
-* python3 main.py --config "path/to/config/file" --mode inference      for generating images
+* Run main.py by python3 main.py --config config.yml
 
-
-
-
+* See the results in ./data/trainig/output
+   
 
 
 
