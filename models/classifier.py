@@ -104,7 +104,7 @@ class ClipLoss(nn.Module):
         cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
         
         
-        return torch.mean(1 - (cos(delta_I, delta_T)/delta_I.norm(dim=1, p=2) * delta_T.norm(dim=1, p=2)))
+        return torch.mean(1 - (cos(delta_I, delta_T)/(delta_I.norm(dim=1, p=2) * delta_T.norm(dim=1, p=2))))
      
     
 

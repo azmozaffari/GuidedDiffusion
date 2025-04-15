@@ -18,29 +18,11 @@ import torchvision
 
 import os
 torch.cuda.empty_cache() 
-# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:<enter-size-here>"
-
-
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-
-
 
 
 def parse_args_and_config():
     parser = argparse.ArgumentParser(description=globals()['__doc__'])
     parser.add_argument('--config', type=str, required=True, help='Path to the config file')
-    parser.add_argument('--seed', type=int, default=1234, help='Random seed')
-    parser.add_argument('--exp', type=str, default='./img', help='Path for saving running related data.')
-    parser.add_argument('--comment', type=str, default='', help='A string for experiment comment')
-    parser.add_argument('--verbose', type=str, default='info', help='Verbose level: info | debug | warning | critical')
-    parser.add_argument('--sample', action='store_true', help='Whether to produce samples from the model')
-    parser.add_argument('-i', '--image_folder', type=str, default='images', help="The folder name of samples")
-    parser.add_argument('--ni', action='store_true', help="No interaction. Suitable for Slurm Job launcher")
-    # parser.add_argument('--npy_name', type=str, required=True)
-    parser.add_argument('--sample_step', type=int, default=3, help='Total sampling steps')
-    parser.add_argument('--t', type=int, default=400, help='Sampling noise scale')
-    parser.add_argument('--status', type=str, default="train", help='train or test')
-    parser.add_argument('--finetuned_classifier', type=str, default="off", help='off or on to use finetuned classifier')
     args = parser.parse_args()
 
     # parse config file
@@ -53,10 +35,10 @@ def parse_args_and_config():
     new_config.device = device
 
     # ---------------- set random seed -----------------------------------------------
-    torch.manual_seed(args.seed)
-    np.random.seed(args.seed)
+    torch.manual_seed(32)
+    np.random.seed(32)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+        torch.cuda.manual_seed_all(32)
 
     torch.backends.cudnn.benchmark = True
 
@@ -79,7 +61,6 @@ def main():
 
 
 # load pretrained checkpoints for face generation model
-    config.training.use_finetuned_classifier = args.finetuned_classifier
     model_pretrained = DDPM(config)
     ckpt =  torch.load(config.checkpoints.pretrained_diffusion_checkpoint, weights_only=True)
     model_pretrained.load_state_dict(ckpt)
@@ -88,126 +69,19 @@ def main():
     
 # ------------------  TRAIN ----------------------------
 
-    if args.status == "train":
-        # define the image transformet
-        transform = transforms.Compose([            
-                transforms.Resize((config.data.image_size,config.data.image_size)),
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ]) 
-        
-        # call the customized data loader
-        d_source = FaceDataset(config.training.random_source_img, transform)
-        dataloader_source = DataLoader(d_source, batch_size=config.training.batch_size,
-                            shuffle=True, num_workers=1)
-        
-        d_target = FaceDataset(config.training.target_img, transform)
-        dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
-                            shuffle=True, num_workers=1)
-        
-
-        d_pillar =FaceDataset(config.training.pillar_img, transform)
-        dataloader_pillar = DataLoader(d_pillar, batch_size=config.training.batch_size,
-                            shuffle=True, num_workers=1)
-        
-        
-        
-        train(model_pretrained, config, dataloader_source, dataloader_target, dataloader_pillar)
-
-
-# # --------------------- TEST -----------------------------
-
-#     if args.status == "test":
-
-        
-#         torch.cuda.empty_cache() 
-#         # load finetuned model 
-#         try:
-#             model_f = DDPM(config)
-#             # runner.image_editing_sample()
-#         except Exception:
-#             logging.error(traceback.format_exc())
-
-#         # load pretrained weights to DDPM
-#         ckpt =  torch.load("./data/checkpoints/ckpt19", weights_only=True)
-#         model_f.load_state_dict(ckpt)
-#         model_f.to(config.device)
-#         print("Finetuned Model loaded")
-
-
-
-
-
-#         # define the image transformet
-#         transform = transforms.Compose([            
-#                 transforms.Resize((config.data.image_size,config.data.image_size)),
-#                 transforms.ToTensor(),
-#                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-#             ]) 
-        
-#         # call the customized data loader
-#         d = FaceDataset("./data/test", transform)
-#         dataloader = DataLoader(d, batch_size=2,
-#                             shuffle=True, num_workers=1)
-
-#         # The label folder of test images can be empty! No worries
-
-        
-#         for param in model_p.parameters():
-#             param.requires_grad = False
-#         for param in model_f.parameters():
-#             param.requires_grad = False
-
-#         test(model_f, model_p,config, dataloader)
-#       
-# --------------------   DDIM Generating Random samples  -----------------------------
+ 
+    # define the image transformet
+    transform = transforms.Compose([            
+            transforms.Resize((config.data.image_size,config.data.image_size)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ]) 
+   
+    d_target = FaceDataset(config.training.target_img, transform)
+    dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
+                        shuffle=True, num_workers=1)    
     
-
-
-    if args.status == "generate":
-        # generate samples from DDIM process with sigma != 0
-        for param in model_pretrained.parameters():
-                param.requires_grad = False
-
-
-        transform = transforms.Compose([            
-                        transforms.Resize((config.data.image_size,config.data.image_size)),
-                        transforms.ToTensor(),
-                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                    ]) 
-                
-                
-        d_target = FaceDataset(config.training.target_img, transform)
-        dataloader_target = DataLoader(d_target, batch_size=config.training.batch_size,
-                                    shuffle=True, num_workers=1)
-
-
-        for img,_,  in dataloader_target:
-                    img = img.to(config.device)  
-                    noisy_img = DDIM_inversion(model_pretrained, config, img)
-                    noisy_img = noisy_img.to(config.device)
-                    x0_pred = DDIM_generation(model_pretrained, config, noisy_img)
-
-
-                    ims = torch.clamp(x0_pred, -1., 1.).detach().cpu()
-                    ims = (ims + 1) / 2        
-                    for j in range(ims.size(0)):
-                        torchvision.utils.save_image(ims[j, :, :, :], os.path.join(config.training.random_source_img,"3"+_[j]))         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    train(model_pretrained, config,dataloader_target)
 
     return 0
 

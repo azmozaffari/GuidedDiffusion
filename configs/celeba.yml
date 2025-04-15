@@ -29,7 +29,7 @@ samplingDDIM:
     beta_end: 0.02
     DDPM_num_timesteps: 1000 
     sigma : 0.00   # generate random source samples with sigma 0.008 0.006 and 0.005
-    t : 500 ###  The maximum time steps for inversion and denoising in DDIM
+    t : 700 ###  The maximum time steps for inversion and denoising in DDIM
     stepsize_forward: 10 
     stepsize_backward: 50  
 
@@ -38,12 +38,11 @@ training:
     random_source_img: "./data/training/source"
     target_img: "./data/training/target"
     output_img: "./data/training/output"
-    pillar_img: "./data/training/pillar"
-    n_epochs: 20
+    n_epochs: 3
     batch_size : 6
     lr : 0.000004
-    clip_classifier_text_source : "face"
-    clip_classifier_text_target : " a german flag"
+    clip_classifier_text_source : "face "
+    clip_classifier_text_target : "Angry face"
     use_finetuned_classifier: "off"  # or on
     ref_img: "./data/training/ref_img.jpg"
 
@@ -51,10 +50,9 @@ training:
 
 checkpoints:
     pretrained_diffusion_checkpoint: "./pre_trained/celeba_hq.ckpt"
-    finetuned_diffusion_checkpoints: "./data/checkpoints"
     pretrained_classifier_FACEID: ./pre_trained/model_ir_se50.pth
     pretrained_classifier_emonet: ./pre_trained/emonet_5.pth
-    pretrained_classifier_clip: "./pre_trained/5clip_finetuned.pth"
+    finetuned_diffusion_checkpoints: ./data/checkpoints   # where to save the fine-tuned weights
 
 
 
