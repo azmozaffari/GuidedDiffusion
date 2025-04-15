@@ -1,6 +1,12 @@
 # GuidedDiffusion
 
-Recently, it has been shown in the literature that using CLIP as a classifier to guide the generative models like GAN and StyleGAN can lead to interesting results. Here, I implemented [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) as a classifier guided diffusion model.
+Recently, it has been shown in the literature that using CLIP as a classifier to guide the generative models like GAN and StyleGAN can lead to interesting results. Here, I've implemented [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) model as a classifier guided diffusion model.
+
+Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs and generate the changed samples during the training phase.
+
+I also compare the generative results, in the case of using Emonet and CLIP to guide the diffusion model.
+
+# Quick Start
 
 
 
