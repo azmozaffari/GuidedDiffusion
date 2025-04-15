@@ -8,7 +8,19 @@ I also compare the generative results, in the case of using Emonet and CLIP to g
 
 # Quick Start
 
+* Create a new conda environment with python 3.8 then run below commands
 
+* git clone https://github.com/azmozaffari/GuidedDiffusion.git
+
+* cd GuidedDiffusion
+
+* pip install -r requirements.txt
+
+* For training/inference use the below commands passing the desired configuration file as the config argument in case you want to play with it.
+
+* python3 main.py --config "path/to/config/file" --mode training       for training ddpm
+
+* python3 main.py --config "path/to/config/file" --mode inference      for generating images
 
 
 
