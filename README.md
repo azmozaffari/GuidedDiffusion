@@ -33,7 +33,7 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 
 # Results
 * CLIP results:
-
+original samples from CelebA dataset
   <table>
   <tr>
     <td> <img src="./images/source/00007.jpg"  alt="1" width = 128px height = 128px ></td>
@@ -41,18 +41,32 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
     <td> <img src="./images/source/00028.jpg"  alt="3" width = 128px height = 128px ></td>
     <td> <img src="./images/source/00045.jpg"  alt="4" width = 128px height = 128px ></td>
    </tr> 
-  <tr>
-    <td> <img src="./images/10.jpg"  alt="1" width = 36px height = 36px ></td>
-    <td> <img src="./images/1110.jpg"  alt="2" width = 36px height = 36px ></td>    
-    <td> <img src="./images/2210.jpg" alt="3" width = 36px height = 36px ></td>    
-    <td> <img src="./images/3310.jpg" alt="4" width = 36px height = 36px ></td>    
-    <td> <img src="./images/4410.jpg" alt="5" width = 36px height = 36px ></td>    
-    <td> <img src="./images/5510.jpg" alt="6" width = 36px height = 36px ></td>    
-    <td> <img src="./images/6610.jpg" alt="7" width = 36px height = 36px ></td>    
-    <td> <img src="./images/7710.jpg" alt="8" width = 36px height = 36px ></td>    
-    <td> <img src="./images/8810.jpg" alt="9" width = 36px height = 36px ></td>    
-    <td> <img src="./images/9910.jpg" alt="10" width = 36px height = 36px ></td>
+  </table>
+
+
+Results after fine-tuning the diffusion model with CLIP classifier with guided text: "fearful face"
+  <table>
+<tr>
+     <tr>
+    <td> <img src="./images/clipfear/00007.jpg"  alt="1" width = 128px height = 128px ></td>
+    <td> <img src="./images/clipfear/00008.jpg"  alt="2" width = 128px height = 128px ></td>
+    <td> <img src="./images/clipfear/00028.jpg"  alt="3" width = 128px height = 128px ></td>
+    <td> <img src="./images/clipfear/00045.jpg"  alt="4" width = 128px height = 128px ></td>
+   </tr> 
   </tr> 
 </table>
+
+Results after fine-tuning the diffusion model with CLIP classifier with guided text: "happy face"
+  <table>
+<tr>
+     <tr>
+    <td> <img src="./images/cliphappy/00007.jpg"  alt="1" width = 128px height = 128px ></td>
+    <td> <img src="./images/cliphappy/00008.jpg"  alt="2" width = 128px height = 128px ></td>
+    <td> <img src="./images/cliphappy/00028.jpg"  alt="3" width = 128px height = 128px ></td>
+    <td> <img src="./images/cliphappy/00045.jpg"  alt="4" width = 128px height = 128px ></td>
+   </tr> 
+  </tr> 
+</table>
+
 
 
