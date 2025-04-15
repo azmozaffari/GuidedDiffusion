@@ -44,7 +44,6 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
    </tr> 
   </table>
 
-
 * Results after fine-tuning the diffusion model with CLIP classifier with guided text: "fearful face"
   <table>
 <tr>
@@ -56,7 +55,6 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
    </tr> 
   </tr> 
 </table>
-
 * Results after fine-tuning the diffusion model with CLIP classifier with guided text: "happy face"
   <table>
 <tr>
