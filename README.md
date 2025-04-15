@@ -4,8 +4,11 @@ Recently, it has been shown in the literature that using CLIP as a classifier to
 
 Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs and generate the changed samples during the training phase.
 
-I also compare the generative results, in the case of using Emonet and CLIP to guide the diffusion model.
+In order to use less GPU resources, the GPU-efficient fine-tunning approach is only implemented.
 
+I also compare the generative results, in the case of using Emonet versus CLIP to guide the diffusion model.
+
+A part of the codes are grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP)
 # Quick Start
 
 * Create a new conda environment with python 3.8 then run below commands
