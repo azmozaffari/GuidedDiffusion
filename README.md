@@ -33,7 +33,8 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 
 # Results
 * CLIP results:
-original samples from CelebA dataset
+* original samples from CelebA dataset
+
   <table>
   <tr>
     <td> <img src="./images/source/00007.jpg"  alt="1" width = 128px height = 128px ></td>
@@ -44,7 +45,7 @@ original samples from CelebA dataset
   </table>
 
 
-Results after fine-tuning the diffusion model with CLIP classifier with guided text: "fearful face"
+* Results after fine-tuning the diffusion model with CLIP classifier with guided text: "fearful face"
   <table>
 <tr>
      <tr>
@@ -56,7 +57,7 @@ Results after fine-tuning the diffusion model with CLIP classifier with guided t
   </tr> 
 </table>
 
-Results after fine-tuning the diffusion model with CLIP classifier with guided text: "happy face"
+* Results after fine-tuning the diffusion model with CLIP classifier with guided text: "happy face"
   <table>
 <tr>
      <tr>
