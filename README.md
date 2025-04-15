@@ -1,6 +1,6 @@
 # GuidedDiffusion
 
-Recently, it has been shown in the literature that using CLIP as a classifier to guide the generative models like GAN and StyleGAN can lead to interesting results. Here, I implemented [https://github.com/gwang-kim/DiffusionCLIP](DiffusionClip) as a classifier guided diffusion model.
+Recently, it has been shown in the literature that using CLIP as a classifier to guide the generative models like GAN and StyleGAN can lead to interesting results. Here, I implemented [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP)) as a classifier guided diffusion model.
 
 
 
