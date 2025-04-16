@@ -1,14 +1,14 @@
 # GuidedDiffusion
 
-Recently, it has been shown in the literature that using CLIP as a classifier to guide generative models like GAN and StyleGAN can lead to interesting results. Here, I've implemented [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) paper that proposed to use CLIP as a classifier to guide the diffusion model.
+Recently, it has been shown in the literature that using CLIP as a classifier to guide generative models like GAN and StyleGAN with text can lead to interesting results. Here, I've implemented a part of [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) paper that proposed to use CLIP as a classifier to guide a denoising diffusion model.
 
-Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs and generate the changed samples during the training phase.
+Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs. The samples are generated during the training phase. Then to generate every new sample, we have to fine-tune the model for that sample first. 
 
-To use fewer GPU resources, the GPU-efficient fine-tuning approach is only implemented.
+To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented.
 
-I also compare the generative results, in the case of using Emonet versus CLIP to guide the diffusion model.
+I also compare the generative results, in the case of using Emonet versus CLIP as a classifier to guide the diffusion model.
 
-A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation. The DDPM implementation model is downloaded from [https://github.com/explainingai-code/DDPM-Pytorch/tree/main](https://github.com/explainingai-code/DDPM-Pytorch/tree/main).
+A part of this code is grabbed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation. The DDPM implementation is downloaded from [https://github.com/explainingai-code/DDPM-Pytorch/tree/main](https://github.com/explainingai-code/DDPM-Pytorch/tree/main).
 
 # Quick Start
 
