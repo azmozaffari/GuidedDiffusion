@@ -32,7 +32,7 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 * celeba.yml - Allows you to play with different components of the Guided Diffusion model
 
 # Results
-* CLIP results:
+### CLIP results:
 * original samples from CelebA dataset
 
   <table>
@@ -65,7 +65,7 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
    </table>
 
 
-* Emonet results:
+### Emonet results:
 
 * Results after fine-tuning the diffusion model with Emonet classifier to generate the images that maximizes the Fear output of the model.
   <table>
