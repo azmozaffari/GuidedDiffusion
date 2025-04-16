@@ -6,7 +6,7 @@ Here, to generate the samples with guided text and clip classifier,  I only fine
 
 To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented.
 
-I also compare the generative results, in the case of using Emonet versus CLIP as a classifier to guide the diffusion model.
+Here, I also compare the generative results for using Emonet versus CLIP as the classifier to guide the diffusion model. To show that not all the classifiers are suitable to guide a generative model.
 
 A part of this code is grabbed from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) original implementation. The DDPM implementation is downloaded from [https://github.com/explainingai-code/DDPM-Pytorch/tree/main](https://github.com/explainingai-code/DDPM-Pytorch/tree/main).
 
