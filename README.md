@@ -65,4 +65,25 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
    </table>
 
 
+* Emonet results:
+
+* Results after fine-tuning the diffusion model with Emonet classifier to generate the images that maximizes the Fear output of the model.
+  <table>
+     <tr>
+    <td> <img src="./images/emonetfear/00007.jpg"  alt="1" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonetfear/00008.jpg"  alt="2" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonetfear/00028.jpg"  alt="3" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonetfear/00045.jpg"  alt="4" width = 128px height = 128px ></td>
+   </tr>   
+   </table>
+
+* Results after fine-tuning the diffusion model with Emonet classifier to generate the images that maximizes the Happy output of the model.
+  <table>
+     <tr>
+    <td> <img src="./images/emonethappy/00007.jpg"  alt="1" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonethappy/00008.jpg"  alt="2" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonethappy/00028.jpg"  alt="3" width = 128px height = 128px ></td>
+    <td> <img src="./images/emonethappy/00045.jpg"  alt="4" width = 128px height = 128px ></td>
+   </tr> 
+   </table>
 
