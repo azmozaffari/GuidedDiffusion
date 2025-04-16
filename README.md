@@ -46,27 +46,26 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 
 * Results after fine-tuning the diffusion model with CLIP classifier with guided text: "fearful face"
   <table>
-<tr>
+
      <tr>
     <td> <img src="./images/clipfear/00007.jpg"  alt="1" width = 128px height = 128px ></td>
     <td> <img src="./images/clipfear/00008.jpg"  alt="2" width = 128px height = 128px ></td>
     <td> <img src="./images/clipfear/00028.jpg"  alt="3" width = 128px height = 128px ></td>
     <td> <img src="./images/clipfear/00045.jpg"  alt="4" width = 128px height = 128px ></td>
    </tr> 
-  </tr> 
+  
 </table>
 
 
 * Results after fine-tuning the diffusion model with CLIP classifier with guided text: "happy face"
   <table>
-<tr>
      <tr>
     <td> <img src="./images/cliphappy/00007.jpg"  alt="1" width = 128px height = 128px ></td>
     <td> <img src="./images/cliphappy/00008.jpg"  alt="2" width = 128px height = 128px ></td>
     <td> <img src="./images/cliphappy/00028.jpg"  alt="3" width = 128px height = 128px ></td>
     <td> <img src="./images/cliphappy/00045.jpg"  alt="4" width = 128px height = 128px ></td>
    </tr> 
-  </tr> 
+
 </table>
 
 
