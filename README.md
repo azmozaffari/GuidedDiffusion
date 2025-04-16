@@ -4,7 +4,7 @@ Recently, it has been shown in the literature that using CLIP as a classifier to
 
 Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs. The samples are generated during the fine-tuning phase. That means to generate every new sample, we have to fine-tune the model for that sample first. 
 
-To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented. The below diagram shows the difference between the two classifier-guided approaches proposed in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP). The diagram is selected from this paper.
+To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented. The below diagram shows the difference between the two classifier-guided approaches proposed in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP). The diagram is selected from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP.
 
 ![Alt text](./images/method2.png)
 
