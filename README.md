@@ -22,7 +22,7 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
 
 * Run the batch file run.sh by ./run.sh
 
-* The target image folder is in ./data/training/target. Drop some CelebA images in this folder
+* The target image folder is in ./data/training/target. Drop some CelebA images in this folder.
 
 * Run main.py by python3 main.py --config celeba.yml
 
@@ -87,3 +87,6 @@ A part of the codes is grabed from [DiffusionClip](https://github.com/gwang-kim/
    </tr> 
    </table>
 
+# Disscusion
+Not all the classifiers can guide the diffusion model effectively. CLIP as trained on a huge dataset, has better resistance to adversaries and can guide the model better than Emonet.
+We should know that x0 predicted in each step of the diffusion model is guided to maximize the classifier output. Then, the classifier that is more robust to noisy images and adversaries leads to better results in this case.
