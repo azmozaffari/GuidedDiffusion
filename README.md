@@ -2,7 +2,7 @@
 
 Recently, it has been shown in the literature that using CLIP as a classifier to guide generative models like GAN and StyleGAN with text can lead to interesting results. Here, I've implemented a part of [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) paper that proposed to use CLIP as a classifier to guide a denoising diffusion model.
 
-Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs. The samples are generated during the training phase. Then to generate every new sample, we have to fine-tune the model for that sample first. 
+Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs. The samples are generated during the fine-tuning phase. That means to generate every new sample, we have to fine-tune the model for that sample first. 
 
 To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented.
 
