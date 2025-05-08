@@ -22,7 +22,13 @@ A part of this code is grabbed from [DiffusionClip](https://github.com/gwang-kim
 
 * pip install -r requirements.txt
 
-* Run the batch file run.sh by ./run.sh
+* Run:
+
+* wget https://huggingface.co/gwang-kim/DiffusionCLIP-CelebA_HQ/resolve/main/celeba_hq.ckpt -O ./pre_trained/celeba_hq.ckpt 
+
+* wget https://www.dropbox.com/s/kzo52d9neybjxsb/model_ir_se50.pth?dl=0 -O ./pre_trained/model_ir_se50.pth
+
+* Download Emonet-5 model from: https://github.com/face-analysis/emonet/blob/master/pretrained/emonet_5.pth and drop in folder ./pre_trained
 
 * The target image folder is in ./data/training/target. Drop some CelebA images in this folder.
 
