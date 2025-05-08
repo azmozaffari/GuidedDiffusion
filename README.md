@@ -4,7 +4,7 @@ Recently, it has been shown in the literature that using CLIP as a classifier to
 
 Here, to generate the samples with guided text and clip classifier,  I only fine-tune the model for 2 epochs. The samples are generated during the fine-tuning phase. That means to generate every new sample, we have to fine-tune the model for that sample first. 
 
-To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented. The below diagram shows the difference between the two classifier-guided approaches proposed in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP). The diagram is selected from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP).
+To use fewer GPU resources, the GPU-efficient fine-tuning approach in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP) is only implemented. The diagram below shows the difference between the two classifier-guided approaches proposed in [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP). The diagram is selected from [DiffusionClip](https://github.com/gwang-kim/DiffusionCLIP).
 
 ![Alt text](./images/method2.png)
 
@@ -75,7 +75,8 @@ A part of this code is grabbed from [DiffusionClip](https://github.com/gwang-kim
 
 ### Emonet results:
 
-* Results after fine-tuning the diffusion model with Emonet classifier to generate the images that maximizes the Fear output of the model.
+To run the model for emonet, in celeba.yml, change the  classifier part to emonet from clip
+* Results after fine-tuning the diffusion model with Emonet classifier to generate the images that maximizes the Fear output of the model. 
   <table>
      <tr>
     <td> <img src="./images/emonetfear/00007.jpg"  alt="1" width = 128px height = 128px ></td>
@@ -95,6 +96,6 @@ A part of this code is grabbed from [DiffusionClip](https://github.com/gwang-kim
    </tr> 
    </table>
 
-# Disscusion
+# Discussion
 Not all the classifiers can guide the diffusion model effectively. CLIP as trained on a huge dataset, has better resistance to adversaries and can guide the model better than Emonet.
 We should know that x0 predicted in each step of the diffusion model is guided to maximize the classifier score. Then, the classifier that is more robust to noisy images and adversaries leads to better results in this case.
